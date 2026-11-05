@@ -1,0 +1,6 @@
+{
+  "name": "Synapse - Lecture Transcriber & Study Suite",
+  "description": "Transform class lecture audio into readable timestamped transcripts, Cornell-style study notes, tailored flashcard decks, and practice quizzes.",
+  "requestFramePermissions": ["microphone"],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
