@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SAMPLE_LECTURES } from './data/sampleLectures';
 import { LectureItem } from './types/lecture';
+import { IMAGES } from './assets/images';
 import { Navbar } from './components/Navbar';
 import { LectureCard } from './components/LectureCard';
 import { LectureDetailView } from './components/LectureDetailView';
@@ -22,7 +23,7 @@ import {
   GraduationCap
 } from 'lucide-react';
 
-const STORAGE_KEY = 'synapse_lectures_store_v1';
+const STORAGE_KEY = 'synapse_lectures_store_v7';
 const THEME_KEY = 'synapse_theme_preference';
 
 export default function App() {
@@ -33,13 +34,40 @@ export default function App() {
     return window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches;
   });
 
-  // Lectures store
+  // Lectures store with image asset synchronization
   const [lectures, setLectures] = useState<LectureItem[]>(() => {
     try {
-      const saved = localStorage.getItem(STORAGE_KEY);
+      const saved =
+        localStorage.getItem(STORAGE_KEY) ||
+        localStorage.getItem('synapse_lectures_store_v6') ||
+        localStorage.getItem('synapse_lectures_store_v5') ||
+        localStorage.getItem('synapse_lectures_store_v4') ||
+        localStorage.getItem('synapse_lectures_store_v2') ||
+        localStorage.getItem('synapse_lectures_store_v1');
       if (saved) {
         const parsed = JSON.parse(saved);
-        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          // Synchronize fresh sample cover images from SAMPLE_LECTURES
+          return parsed.map((item: LectureItem) => {
+            if (item.id === 'lecture-neuro-101' || item.courseCode === 'NEURO 101') {
+              return { ...item, coverImage: IMAGES.neuroscience };
+            }
+            if (item.id === 'lecture-cs-229' || item.courseCode === 'CS 229') {
+              return { ...item, coverImage: IMAGES.machineLearning };
+            }
+            if (item.id === 'lecture-law-204' || item.courseCode === 'LAW 204') {
+              return { ...item, coverImage: IMAGES.constitutionalLaw };
+            }
+            if (item.youtubeId) {
+              return { ...item, coverImage: `https://img.youtube.com/vi/${item.youtubeId}/hqdefault.jpg` };
+            }
+            const match = SAMPLE_LECTURES.find((s) => s.id === item.id);
+            if (match && match.coverImage) {
+              return { ...item, coverImage: match.coverImage };
+            }
+            return item;
+          });
+        }
       }
     } catch (e) {
       console.warn('Failed to parse saved lectures:', e);
@@ -297,10 +325,13 @@ export default function App() {
                 {/* Right Hero Image */}
                 <div className="lg:col-span-5 relative min-h-[260px] lg:min-h-full overflow-hidden bg-slate-100 dark:bg-slate-800">
                   <img
-                    src="/src/assets/images/study_suite_hero_1793841736493.jpg"
+                    src={IMAGES.hero}
                     alt="University student lecture workspace"
-                    referrerPolicy="no-referrer"
+                    loading="eager"
                     className="h-full w-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = 'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?auto=format&fit=crop&w=1200&q=80';
+                    }}
                   />
                   <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 via-transparent to-transparent lg:bg-gradient-to-r lg:from-slate-950/40 lg:to-transparent" />
                 </div>

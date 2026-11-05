@@ -1,5 +1,6 @@
 import React from 'react';
 import { LectureItem } from '../types/lecture';
+import { IMAGES } from '../assets/images';
 import { Clock, BookOpen, Layers, CheckSquare, Sparkles, ArrowRight, Youtube } from 'lucide-react';
 
 interface LectureCardProps {
@@ -8,6 +9,37 @@ interface LectureCardProps {
 }
 
 export const LectureCard: React.FC<LectureCardProps> = ({ lecture, onSelect }) => {
+  const [imgError, setImgError] = React.useState(false);
+
+  const resolvedCover = React.useMemo(() => {
+    // Guarantee fresh, high-res Unsplash CDN photos for the sample decks
+    if (lecture.id === 'lecture-neuro-101' || lecture.courseCode === 'NEURO 101') {
+      return IMAGES.neuroscience;
+    }
+    if (lecture.id === 'lecture-cs-229' || lecture.courseCode === 'CS 229') {
+      return IMAGES.machineLearning;
+    }
+    if (lecture.id === 'lecture-law-204' || lecture.courseCode === 'LAW 204') {
+      return IMAGES.constitutionalLaw;
+    }
+    if (lecture.youtubeId) {
+      return `https://img.youtube.com/vi/${lecture.youtubeId}/hqdefault.jpg`;
+    }
+    if (!lecture.coverImage) return undefined;
+    if (lecture.coverImage.startsWith('http')) {
+      return lecture.coverImage;
+    }
+    if (lecture.coverImage.includes('neuroscience')) return IMAGES.neuroscience;
+    if (lecture.coverImage.includes('machine_learning') || lecture.coverImage.includes('machineLearning')) return IMAGES.machineLearning;
+    if (lecture.coverImage.includes('constitutional_law') || lecture.coverImage.includes('constitutionalLaw')) return IMAGES.constitutionalLaw;
+    if (lecture.coverImage.includes('hero')) return IMAGES.hero;
+    return undefined;
+  }, [lecture.id, lecture.courseCode, lecture.coverImage, lecture.youtubeId]);
+
+  React.useEffect(() => {
+    setImgError(false);
+  }, [resolvedCover]);
+
   return (
     <div
       onClick={() => onSelect(lecture, 'notes')}
@@ -16,16 +48,23 @@ export const LectureCard: React.FC<LectureCardProps> = ({ lecture, onSelect }) =
       <div>
         {/* Cover Image or Fallback container */}
         <div className="relative h-44 w-full overflow-hidden bg-slate-100 dark:bg-slate-800">
-          {lecture.coverImage ? (
+          {resolvedCover && !imgError ? (
             <img
-              src={lecture.coverImage}
+              src={resolvedCover}
               alt={lecture.title}
-              referrerPolicy="no-referrer"
+              loading="eager"
+              onError={() => setImgError(true)}
               className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-gradient-to-br from-indigo-500/10 to-purple-500/10">
-              <BookOpen className="h-10 w-10 text-indigo-400" />
+            <div className="flex h-full w-full flex-col items-center justify-center bg-gradient-to-br from-indigo-500/10 via-purple-500/10 to-slate-800/10 p-4 text-center">
+              <BookOpen className="h-8 w-8 text-indigo-500 mb-2" />
+              <span className="font-mono text-xs font-semibold text-slate-700 dark:text-slate-200">
+                {lecture.courseCode}
+              </span>
+              <span className="text-[11px] text-slate-500 dark:text-slate-400 line-clamp-1">
+                {lecture.subject}
+              </span>
             </div>
           )}
           <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/20 to-transparent" />

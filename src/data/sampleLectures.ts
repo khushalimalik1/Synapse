@@ -1,4 +1,5 @@
 import { LectureItem } from '../types/lecture';
+import { IMAGES } from '../assets/images';
 
 export const SAMPLE_LECTURES: LectureItem[] = [
   {
@@ -9,7 +10,7 @@ export const SAMPLE_LECTURES: LectureItem[] = [
     instructor: 'Dr. Elena Vasquez',
     date: 'Nov 3, 2026',
     duration: '48 min',
-    coverImage: '/src/assets/images/lecture_neuroscience_1793841736590.jpg',
+    coverImage: IMAGES.neuroscience,
     status: 'ready',
     overview: {
       summary:
@@ -341,7 +342,7 @@ export const SAMPLE_LECTURES: LectureItem[] = [
     instructor: 'Prof. Andrew Rivera',
     date: 'Nov 1, 2026',
     duration: '52 min',
-    coverImage: '/src/assets/images/lecture_machine_learning_1793841737672.jpg',
+    coverImage: IMAGES.machineLearning,
     status: 'ready',
     overview: {
       summary:
@@ -601,7 +602,7 @@ export const SAMPLE_LECTURES: LectureItem[] = [
     instructor: 'Prof. Jonathan Vance',
     date: 'Oct 28, 2026',
     duration: '45 min',
-    coverImage: '/src/assets/images/lecture_constitutional_law_1793841738090.jpg',
+    coverImage: IMAGES.constitutionalLaw,
     status: 'ready',
     overview: {
       summary:

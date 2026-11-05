@@ -713,6 +713,7 @@ export const RecordModal: React.FC<RecordModalProps> = ({
                     <img
                       src={youtubePreview.thumbnail}
                       alt="YouTube video thumbnail"
+                      referrerPolicy="no-referrer"
                       className="h-16 w-28 rounded-lg object-cover shrink-0 shadow-sm"
                     />
                   )}

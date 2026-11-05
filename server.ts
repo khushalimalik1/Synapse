@@ -15,6 +15,27 @@ const PORT = process.env.PORT || 3000;
 const app = express();
 app.use(express.json({ limit: '60mb' }));
 app.use(express.urlencoded({ extended: true, limit: '60mb' }));
+app.use('/images', express.static(path.resolve(__dirname, 'public/images')));
+app.use('/src/assets/images', express.static(path.resolve(__dirname, 'public/images')));
+app.use(express.static(path.resolve(__dirname, 'public')));
+
+// Explicit image endpoint returning images directly via Express sendFile
+app.get('/api/image/:id', (req: Request, res: Response) => {
+  const map: Record<string, string> = {
+    hero: 'study_suite_hero.jpg',
+    neuroscience: 'lecture_neuroscience.jpg',
+    machine_learning: 'lecture_machine_learning.jpg',
+    constitutional_law: 'lecture_constitutional_law.jpg',
+  };
+  const fileName = map[req.params.id] || `${req.params.id}.jpg`;
+  const filePath = path.resolve(__dirname, 'public/images', fileName);
+  res.setHeader('Cache-Control', 'public, max-age=86400');
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.status(404).end();
+    }
+  });
+});
 
 // Shared Server-Side Gemini Client with 'aistudio-build' User-Agent
 const ai = new GoogleGenAI({
